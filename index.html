@@ -1,101 +1,93 @@
-/**
- * CONFIG
- * 1) Cole aqui a URL do seu Apps Script Web App (deployed)
- * 2) Defina um token simples (mesmo token no Apps Script)
- */
-const CONFIG = {
-  API_URL: "COLE_AQUI_A_URL_DO_WEB_APP",
-  TOKEN: "troque_este_token"
-};
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro de Moldagem</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">🧱</div>
+        <div>
+          <div class="title">Registro de Moldagem</div>
+          <div class="subtitle">Web App + Google Sheets</div>
+        </div>
+      </div>
+      <div id="statusPill" class="pill neutral">Pronto</div>
+    </header>
 
-const el = (id) => document.getElementById(id);
+    <section class="card">
+      <form id="frm">
+        <div class="grid">
+          <label>
+            <span>Data</span>
+            <input id="data" type="date" required />
+          </label>
 
-const statusPill = el("statusPill");
-const frm = el("frm");
-const btnAgora = el("btnAgora");
-const btnLimpar = el("btnLimpar");
-const btnEnviar = el("btnEnviar");
+          <label>
+            <span>Hora</span>
+            <input id="hora" type="time" step="60" required />
+          </label>
 
-function setPill(kind, text){
-  statusPill.className = "pill " + (kind || "neutral");
-  statusPill.textContent = text;
-}
+          <label class="full">
+            <span>ID do Lote</span>
+            <input id="lote" type="text" placeholder="Ex.: LOTE-2026-001" required />
+          </label>
 
-function pad2(n){ return String(n).padStart(2,"0"); }
+          <label class="full">
+            <span>Traço</span>
+            <input id="traco" type="text" placeholder="Ex.: TR-320 / Padrão / etc." required />
+          </label>
 
-function setNow(){
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = pad2(d.getMonth()+1);
-  const dd = pad2(d.getDate());
-  const hh = pad2(d.getHours());
-  const mi = pad2(d.getMinutes());
-  el("data").value = `${yyyy}-${mm}-${dd}`;
-  el("hora").value = `${hh}:${mi}`;
-}
+          <label>
+            <span>Flow (mm)</span>
+            <input id="flow" type="number" min="0" step="1" placeholder="Ex.: 650" required />
+          </label>
 
-function clearForm(){
-  frm.reset();
-  setNow();
-}
+          <label>
+            <span>Resultado</span>
+            <select id="resultado" required>
+              <option value="" selected disabled>Selecione</option>
+              <option value="APROVADO">Aprovado</option>
+              <option value="REPROVADO">Reprovado</option>
+            </select>
+          </label>
 
-async function send(payload){
-  const res = await fetch(CONFIG.API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-APP-TOKEN": CONFIG.TOKEN
-    },
-    body: JSON.stringify(payload)
-  });
+          <label>
+            <span>Corpo de Prova</span>
+            <select id="cp" required>
+              <option value="" selected disabled>Selecione</option>
+              <option value="SIM">Sim</option>
+              <option value="NAO">Não</option>
+            </select>
+          </label>
+        </div>
 
-  const txt = await res.text();
-  let json;
-  try { json = JSON.parse(txt); } catch(e){ json = { ok:false, raw: txt }; }
+        <div class="actions">
+          <button id="btnEnviar" type="submit">Enviar</button>
+          <button id="btnAgora" type="button" class="secondary">Agora</button>
+          <button id="btnLimpar" type="button" class="ghost">Limpar</button>
+        </div>
 
-  if(!res.ok || !json.ok){
-    throw new Error(json.error || `Falha HTTP ${res.status}`);
-  }
-  return json;
-}
+        <div class="hint">
+          Temperatura/Umidade + Nível de Risco + Risco de Cura são puxados automaticamente pela data/hora.
+        </div>
+      </form>
+    </section>
 
-btnAgora.addEventListener("click", () => setNow());
-btnLimpar.addEventListener("click", () => clearForm());
+    <section class="card" id="lastCard" style="display:none;">
+      <div class="cardTitle">Último envio</div>
+      <pre id="lastJson" class="json"></pre>
+    </section>
 
-frm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    <footer class="foot">
+      <span>Concrefer • Web App offline-friendly (UI)</span>
+    </footer>
+  </main>
 
-  btnEnviar.disabled = true;
-  setPill("neutral", "Enviando...");
-
-  const payload = {
-    data: el("data").value,          // YYYY-MM-DD
-    hora: el("hora").value,          // HH:MM
-    lote: el("lote").value.trim(),
-    traco: el("traco").value.trim(),
-    flow_mm: Number(el("flow").value),
-    resultado: el("resultado").value,
-    corpo_de_prova: el("cp").value
-  };
-
-  try{
-    const out = await send(payload);
-    setPill("ok", "Salvo ✅");
-
-    el("lastCard").style.display = "block";
-    el("lastJson").textContent = JSON.stringify(out, null, 2);
-
-    // comportamento “app”: limpa e mantém data/hora atual
-    clearForm();
-  }catch(err){
-    console.error(err);
-    setPill("bad", "Erro ❌");
-    alert("Erro ao salvar: " + err.message);
-  }finally{
-    btnEnviar.disabled = false;
-  }
-});
-
-// init
-setNow();
-setPill("neutral", "Pronto");
+  <script src="app.js"></script>
+</body>
+</html>
