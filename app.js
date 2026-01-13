@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbztSMw67K5w7Y2azoKB7MhrcQBnBux2gLRL6qF4mw5dNkUB3QDImTiSSmjX3kFVHeA6/exec"
+  API_URL: "https://script.google.com/macros/s/AKfycbygIQUjh_B7PEshMQ_vgL8UNwUJx_DqLVJAoLvvBlhkkUyw9zSGk81UjE0vwMLI3_kj/exec"
 };
 
 const el = (id) => document.getElementById(id);
@@ -68,20 +68,11 @@ async function fetchPreview() {
   const url = `${CONFIG.API_URL}?action=preview&data=${encodeURIComponent(data)}&hora=${encodeURIComponent(hora)}`;
 
   try {
-    const res = await fetch(url, { method: "GET" });
-    const txt = await res.text();
-
-    let json;
-    try { json = JSON.parse(txt); }
-    catch {
-      console.log("Preview não retornou JSON. Resposta:", txt);
-      throw new Error("Preview não retornou JSON");
-    }
-
+    const res = await fetch(url);
+    const json = await res.json();
     if (!json.ok) throw new Error(json.error || "Preview ok=false");
 
     const p = json.preview;
-
     pv.temp.textContent = (p.temperatura ?? "—") + " °C";
     pv.umid.textContent = (p.umidade ?? "—") + " %";
     pv.nivel.textContent = p.nivel_de_risco ?? "—";
@@ -124,23 +115,22 @@ btnLimpar.addEventListener("click", () => {
   schedulePreview();
 });
 
-// ===== Salvar =====
-async function send(payload) {
-  // ✅ IMPORTANTÍSSIMO: text/plain evita o preflight CORS do Apps Script
-  const res = await fetch(CONFIG.API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  });
+// ===== Salvar (via GET) =====
+async function saveViaGet(payload) {
+  const qs =
+    `action=save` +
+    `&data=${encodeURIComponent(payload.data)}` +
+    `&hora=${encodeURIComponent(payload.hora)}` +
+    `&lote=${encodeURIComponent(payload.lote)}` +
+    `&traco=${encodeURIComponent(payload.traco)}` +
+    `&flow_mm=${encodeURIComponent(String(payload.flow_mm))}` +
+    `&resultado=${encodeURIComponent(payload.resultado)}` +
+    `&corpo_de_prova=${encodeURIComponent(payload.corpo_de_prova)}`;
 
-  const txt = await res.text();
-  let json;
-  try { json = JSON.parse(txt); }
-  catch {
-    console.log("POST não retornou JSON. Resposta:", txt);
-    throw new Error("POST não retornou JSON");
-  }
+  const url = `${CONFIG.API_URL}?${qs}`;
 
+  const res = await fetch(url);
+  const json = await res.json();
   if (!json.ok) throw new Error(json.error || "Falha ao salvar");
   return json;
 }
@@ -165,7 +155,7 @@ frm.addEventListener("submit", async (e) => {
   };
 
   try {
-    const out = await send(payload);
+    const out = await saveViaGet(payload);
     await fetchPreview();
 
     setPill("ok", "Salvo ✅");
@@ -176,13 +166,11 @@ frm.addEventListener("submit", async (e) => {
       `Nível: ${out.saved.nivel_de_risco} | Cura: ${out.saved.risco_de_cura}`
     );
 
-    // mantém data/hora e limpa o resto
     const keepData = el("data").value;
     const keepHora = el("hora").value;
 
     frm.reset();
     clearPreview();
-
     el("data").value = keepData;
     el("hora").value = keepHora;
 
