@@ -13,7 +13,7 @@
         <div class="logo">🧱</div>
         <div>
           <div class="title">Registro de Moldagem</div>
-          <div class="subtitle">Web App + Google Sheets</div>
+          <div class="subtitle">Web App (Sheets)</div>
         </div>
       </div>
       <div id="statusPill" class="pill neutral">Pronto</div>
@@ -39,52 +39,79 @@
 
           <label class="full">
             <span>Traço</span>
-            <input id="traco" type="text" placeholder="Ex.: TR-320 / Padrão / etc." required />
+            <input id="traco" type="text" placeholder="Ex.: TR-320" required />
           </label>
 
           <label>
             <span>Flow (mm)</span>
             <input id="flow" type="number" min="0" step="1" placeholder="Ex.: 650" required />
           </label>
-
-          <label>
-            <span>Resultado</span>
-            <select id="resultado" required>
-              <option value="" selected disabled>Selecione</option>
-              <option value="APROVADO">Aprovado</option>
-              <option value="REPROVADO">Reprovado</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Corpo de Prova</span>
-            <select id="cp" required>
-              <option value="" selected disabled>Selecione</option>
-              <option value="SIM">Sim</option>
-              <option value="NAO">Não</option>
-            </select>
-          </label>
         </div>
 
+        <!-- BOTÕES CLICÁVEIS: RESULTADO -->
+        <div class="segWrap">
+          <div class="segTitle">Resultado</div>
+          <div class="seg" role="group" aria-label="Resultado">
+            <button type="button" class="segBtn" data-group="resultado" data-value="APROVADO">Aprovado</button>
+            <button type="button" class="segBtn" data-group="resultado" data-value="REPROVADO">Reprovado</button>
+          </div>
+          <input type="hidden" id="resultado" required />
+        </div>
+
+        <!-- BOTÕES CLICÁVEIS: CORPO DE PROVA -->
+        <div class="segWrap">
+          <div class="segTitle">Corpo de Prova</div>
+          <div class="seg" role="group" aria-label="Corpo de Prova">
+            <button type="button" class="segBtn" data-group="cp" data-value="SIM">Sim</button>
+            <button type="button" class="segBtn" data-group="cp" data-value="NAO">Não</button>
+          </div>
+          <input type="hidden" id="cp" required />
+        </div>
+
+        <!-- PREVIEW CLIMA/RISCOS -->
+        <section class="card inner">
+          <div class="cardTitle">Condições (automático)</div>
+
+          <div class="kpiGrid">
+            <div class="kpi">
+              <div class="kpiLabel">Temperatura</div>
+              <div id="pvTemp" class="kpiValue">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpiLabel">Umidade</div>
+              <div id="pvUmid" class="kpiValue">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpiLabel">Nível de Risco</div>
+              <div id="pvNivel" class="kpiValue">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpiLabel">Risco de Cura</div>
+              <div id="pvCura" class="kpiValue">—</div>
+            </div>
+          </div>
+
+          <div class="meta">
+            <span>Match:</span> <span id="pvMatch">—</span>
+            <span class="dot">•</span>
+            <span>Dif:</span> <span id="pvDiff">—</span>
+          </div>
+        </section>
+
         <div class="actions">
-          <button id="btnEnviar" type="submit">Enviar</button>
+          <button id="btnEnviar" type="submit">Salvar</button>
           <button id="btnAgora" type="button" class="secondary">Agora</button>
           <button id="btnLimpar" type="button" class="ghost">Limpar</button>
         </div>
 
         <div class="hint">
-          Temperatura/Umidade + Nível de Risco + Risco de Cura são puxados automaticamente pela data/hora.
+          O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> da sua moldagem e mostra aqui.
         </div>
       </form>
     </section>
 
-    <section class="card" id="lastCard" style="display:none;">
-      <div class="cardTitle">Último envio</div>
-      <pre id="lastJson" class="json"></pre>
-    </section>
-
     <footer class="foot">
-      <span>Concrefer • Web App offline-friendly (UI)</span>
+      <span>Concrefer • Web App</span>
     </footer>
   </main>
 
