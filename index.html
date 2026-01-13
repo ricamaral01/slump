@@ -5,9 +5,208 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Registro de Moldagem</title>
 
-  <!-- Cache-buster: troque v=1 para v=2, v=3 quando atualizar -->
-  <link rel="stylesheet" href="./styles.css?v=1" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#121a2b;
+      --card2:#0f1626;
+      --text:#e8eefc;
+      --muted:#a8b3d1;
+      --line:#27324c;
+      --ok:#26c281;
+      --bad:#ff4d4d;
+      --warn:#f7c948;
+      --btn:#1f2a44;
+      --btn2:#18213a;
+      --shadow:0 10px 24px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(900px 500px at 20% -20%, rgba(56,189,248,.15), transparent 60%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(34,197,94,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .app{
+      max-width:760px;
+      margin:0 auto;
+      padding:16px 14px 24px;
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin:6px 0 14px;
+    }
+    .brand{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .logo{
+      width:42px;height:42px;
+      display:grid;place-items:center;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(34,197,94,.20));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      font-size:20px;
+    }
+    .title{font-weight:750;font-size:18px;line-height:1.1}
+    .subtitle{color:var(--muted);font-size:12px;margin-top:2px}
+
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill.ok{background:rgba(38,194,129,.15); border-color:rgba(38,194,129,.35); color:#bff4dc}
+    .pill.bad{background:rgba(255,77,77,.14); border-color:rgba(255,77,77,.35); color:#ffd0d0}
+    .pill.neutral{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.10); color:var(--muted)}
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .card.inner{
+      margin-top:14px;
+      background:rgba(0,0,0,.15);
+      border-color:rgba(255,255,255,.10);
+    }
+    label span{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin:0 0 6px;
+    }
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus{
+      border-color:rgba(56,189,248,.45);
+      box-shadow:0 0 0 4px rgba(56,189,248,.14);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .full{grid-column:1 / -1}
+    @media (max-width:520px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .segWrap{margin-top:14px}
+    .segTitle{font-weight:700;margin-bottom:8px}
+    .seg{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .segBtn{
+      padding:12px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s transform,.15s background,.15s border-color;
+    }
+    .segBtn:active{transform:scale(.99)}
+    .segBtn.active{
+      border-color:rgba(56,189,248,.55);
+      background:rgba(56,189,248,.16);
+    }
+
+    .cardTitle{font-weight:800;margin-bottom:10px}
+    .kpiGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .kpi{
+      border-radius:14px;
+      padding:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .kpiLabel{color:var(--muted);font-size:12px;margin-bottom:6px}
+    .kpiValue{font-size:18px;font-weight:850}
+    .meta{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .dot{opacity:.6}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    button{
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:800;
+    }
+    #btnEnviar{
+      background:linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.92));
+      color:#062112;
+      flex:1;
+      min-width:160px;
+    }
+    .secondary{
+      background:rgba(56,189,248,.18);
+      color:#dff6ff;
+      border:1px solid rgba(56,189,248,.35);
+    }
+    .ghost{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    #btnEnviar:disabled{opacity:.55; cursor:not-allowed}
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .foot{
+      margin-top:12px;
+      color:rgba(255,255,255,.35);
+      font-size:12px;
+      text-align:center;
+    }
+  </style>
 </head>
+
 <body>
   <main class="app">
     <header class="top">
@@ -50,7 +249,6 @@
           </label>
         </div>
 
-        <!-- RESULTADO (botões) -->
         <div class="segWrap">
           <div class="segTitle">Resultado</div>
           <div class="seg">
@@ -60,7 +258,6 @@
           <input type="hidden" id="resultado" required />
         </div>
 
-        <!-- CORPO DE PROVA (botões) -->
         <div class="segWrap">
           <div class="segTitle">Corpo de Prova</div>
           <div class="seg">
@@ -70,7 +267,6 @@
           <input type="hidden" id="cp" required />
         </div>
 
-        <!-- PREVIEW -->
         <section class="card inner">
           <div class="cardTitle">Condições (automático)</div>
 
@@ -107,17 +303,15 @@
         </div>
 
         <div class="hint">
-          O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> e mostra aqui.
+          O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> e aplica Temperatura/Umidade/Riscos automaticamente.
         </div>
       </form>
     </section>
 
-    <footer class="foot">
-      <span>Concrefer • Web App</span>
-    </footer>
+    <footer class="foot">Concrefer • Web App</footer>
   </main>
 
-  <!-- Cache-buster: troque v=1 para v=2, v=3 quando atualizar -->
-  <script src="./app.js?v=1"></script>
+  <!-- cache-buster simples pra evitar ficar preso -->
+  <script src="./app.js?v=3"></script>
 </body>
 </html>
