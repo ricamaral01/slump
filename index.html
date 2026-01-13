@@ -4,7 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Registro de Moldagem</title>
-  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Cache-buster: troque v=1 para v=2, v=3 quando atualizar -->
+  <link rel="stylesheet" href="./styles.css?v=1" />
 </head>
 <body>
   <main class="app">
@@ -13,7 +15,7 @@
         <div class="logo">🧱</div>
         <div>
           <div class="title">Registro de Moldagem</div>
-          <div class="subtitle">Web App (Sheets)</div>
+          <div class="subtitle">Web App • Google Sheets</div>
         </div>
       </div>
       <div id="statusPill" class="pill neutral">Pronto</div>
@@ -48,45 +50,45 @@
           </label>
         </div>
 
-        <!-- BOTÕES CLICÁVEIS: RESULTADO -->
+        <!-- RESULTADO (botões) -->
         <div class="segWrap">
           <div class="segTitle">Resultado</div>
-          <div class="seg" role="group" aria-label="Resultado">
-            <button type="button" class="segBtn" data-group="resultado" data-value="APROVADO">Aprovado</button>
-            <button type="button" class="segBtn" data-group="resultado" data-value="REPROVADO">Reprovado</button>
+          <div class="seg">
+            <button type="button" class="segBtn" data-group="resultado" data-value="APROVADO">✅ Aprovado</button>
+            <button type="button" class="segBtn" data-group="resultado" data-value="REPROVADO">❌ Reprovado</button>
           </div>
           <input type="hidden" id="resultado" required />
         </div>
 
-        <!-- BOTÕES CLICÁVEIS: CORPO DE PROVA -->
+        <!-- CORPO DE PROVA (botões) -->
         <div class="segWrap">
           <div class="segTitle">Corpo de Prova</div>
-          <div class="seg" role="group" aria-label="Corpo de Prova">
-            <button type="button" class="segBtn" data-group="cp" data-value="SIM">Sim</button>
-            <button type="button" class="segBtn" data-group="cp" data-value="NAO">Não</button>
+          <div class="seg">
+            <button type="button" class="segBtn" data-group="cp" data-value="SIM">🧪 Sim</button>
+            <button type="button" class="segBtn" data-group="cp" data-value="NAO">🚫 Não</button>
           </div>
           <input type="hidden" id="cp" required />
         </div>
 
-        <!-- PREVIEW CLIMA/RISCOS -->
+        <!-- PREVIEW -->
         <section class="card inner">
           <div class="cardTitle">Condições (automático)</div>
 
           <div class="kpiGrid">
             <div class="kpi">
-              <div class="kpiLabel">Temperatura</div>
+              <div class="kpiLabel">🌡 Temperatura</div>
               <div id="pvTemp" class="kpiValue">—</div>
             </div>
             <div class="kpi">
-              <div class="kpiLabel">Umidade</div>
+              <div class="kpiLabel">💧 Umidade</div>
               <div id="pvUmid" class="kpiValue">—</div>
             </div>
             <div class="kpi">
-              <div class="kpiLabel">Nível de Risco</div>
+              <div class="kpiLabel">⚠️ Nível de Risco</div>
               <div id="pvNivel" class="kpiValue">—</div>
             </div>
             <div class="kpi">
-              <div class="kpiLabel">Risco de Cura</div>
+              <div class="kpiLabel">🧱 Risco de Cura</div>
               <div id="pvCura" class="kpiValue">—</div>
             </div>
           </div>
@@ -105,7 +107,7 @@
         </div>
 
         <div class="hint">
-          O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> da sua moldagem e mostra aqui.
+          O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> e mostra aqui.
         </div>
       </form>
     </section>
@@ -115,6 +117,7 @@
     </footer>
   </main>
 
-  <script src="app.js"></script>
+  <!-- Cache-buster: troque v=1 para v=2, v=3 quando atualizar -->
+  <script src="./app.js?v=1"></script>
 </body>
 </html>
