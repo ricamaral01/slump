@@ -1,20 +1,22 @@
-/**
- * CONFIG
- * 1) Cole aqui a URL do seu Apps Script Web App (deployed)
- * 2) Defina um token simples (mesmo token no Apps Script)
- */
 const CONFIG = {
-  API_URL: "COLE_AQUI_A_URL_DO_WEB_APP",
-  TOKEN: "troque_este_token"
+  API_URL: "https://script.google.com/macros/s/AKfycby4ryu84y-ik-XchCAG4a1ssGcK5QU0O29gv0iRRQhRe4ovEtf-Soq-0GqRqtHWi2sH/exec"
 };
 
 const el = (id) => document.getElementById(id);
-
-const statusPill = el("statusPill");
 const frm = el("frm");
+const statusPill = el("statusPill");
+const btnEnviar = el("btnEnviar");
 const btnAgora = el("btnAgora");
 const btnLimpar = el("btnLimpar");
-const btnEnviar = el("btnEnviar");
+
+const pv = {
+  temp: el("pvTemp"),
+  umid: el("pvUmid"),
+  nivel: el("pvNivel"),
+  cura: el("pvCura"),
+  match: el("pvMatch"),
+  diff: el("pvDiff")
+};
 
 function setPill(kind, text){
   statusPill.className = "pill " + (kind || "neutral");
@@ -25,52 +27,117 @@ function pad2(n){ return String(n).padStart(2,"0"); }
 
 function setNow(){
   const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = pad2(d.getMonth()+1);
-  const dd = pad2(d.getDate());
-  const hh = pad2(d.getHours());
-  const mi = pad2(d.getMinutes());
-  el("data").value = `${yyyy}-${mm}-${dd}`;
-  el("hora").value = `${hh}:${mi}`;
+  el("data").value = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  el("hora").value = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
-function clearForm(){
-  frm.reset();
-  setNow();
+function clearPreview(){
+  pv.temp.textContent = "—";
+  pv.umid.textContent = "—";
+  pv.nivel.textContent = "—";
+  pv.cura.textContent = "—";
+  pv.match.textContent = "—";
+  pv.diff.textContent = "—";
 }
+
+function setActive(group, value){
+  document.querySelectorAll(`.segBtn[data-group="${group}"]`).forEach(b=>{
+    b.classList.toggle("active", b.dataset.value === value);
+  });
+  if(group === "resultado") el("resultado").value = value;
+  if(group === "cp") el("cp").value = value;
+}
+
+document.querySelectorAll(".segBtn").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    setActive(btn.dataset.group, btn.dataset.value);
+  });
+});
+
+// PREVIEW: chama o GET action=preview quando data/hora muda
+let previewTimer = null;
+
+async function fetchPreview(){
+  const data = el("data").value;
+  const hora = el("hora").value;
+  if(!data || !hora) return;
+
+  setPill("neutral", "Buscando clima...");
+
+  const url = `${CONFIG.API_URL}?action=preview&data=${encodeURIComponent(data)}&hora=${encodeURIComponent(hora)}`;
+
+  const res = await fetch(url, { method: "GET" });
+  const json = await res.json();
+
+  if(!json.ok){
+    clearPreview();
+    setPill("warn", "Sem clima");
+    return;
+  }
+
+  const p = json.preview;
+
+  pv.temp.textContent = (p.temperatura ?? "—") + " °C";
+  pv.umid.textContent = (p.umidade ?? "—") + " %";
+  pv.nivel.textContent = p.nivel_de_risco ?? "—";
+  pv.cura.textContent = p.risco_de_cura ?? "—";
+  pv.match.textContent = p.matched_datahora ? new Date(p.matched_datahora).toLocaleString("pt-BR") : "—";
+  pv.diff.textContent = (p.diff_minutes ?? "—") + " min";
+
+  setPill("ok", "Pronto");
+}
+
+function schedulePreview(){
+  if(previewTimer) clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => {
+    fetchPreview().catch(err=>{
+      console.error(err);
+      clearPreview();
+      setPill("bad", "Erro preview");
+    });
+  }, 250);
+}
+
+el("data").addEventListener("change", schedulePreview);
+el("hora").addEventListener("change", schedulePreview);
+
+btnAgora.addEventListener("click", () => {
+  setNow();
+  schedulePreview();
+});
+
+btnLimpar.addEventListener("click", () => {
+  frm.reset();
+  clearPreview();
+  setNow();
+  setPill("neutral", "Pronto");
+  schedulePreview();
+});
 
 async function send(payload){
   const res = await fetch(CONFIG.API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-APP-TOKEN": CONFIG.TOKEN
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
-
-  const txt = await res.text();
-  let json;
-  try { json = JSON.parse(txt); } catch(e){ json = { ok:false, raw: txt }; }
-
-  if(!res.ok || !json.ok){
-    throw new Error(json.error || `Falha HTTP ${res.status}`);
-  }
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || "Falha ao salvar");
   return json;
 }
-
-btnAgora.addEventListener("click", () => setNow());
-btnLimpar.addEventListener("click", () => clearForm());
 
 frm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // garante que os hidden inputs foram preenchidos pelos botões
+  if(!el("resultado").value) return alert("Selecione o Resultado (Aprovado/Reprovado).");
+  if(!el("cp").value) return alert("Selecione Corpo de Prova (Sim/Não).");
+
   btnEnviar.disabled = true;
-  setPill("neutral", "Enviando...");
+  setPill("neutral", "Salvando...");
 
   const payload = {
-    data: el("data").value,          // YYYY-MM-DD
-    hora: el("hora").value,          // HH:MM
+    data: el("data").value,
+    hora: el("hora").value,
     lote: el("lote").value.trim(),
     traco: el("traco").value.trim(),
     flow_mm: Number(el("flow").value),
@@ -80,13 +147,35 @@ frm.addEventListener("submit", async (e) => {
 
   try{
     const out = await send(payload);
+
+    // após salvar, atualiza preview (pra refletir o match certinho)
+    await fetchPreview();
+
     setPill("ok", "Salvo ✅");
+    alert(
+      "Salvo ✅\n" +
+      `Temp: ${out.saved.temperatura}°C | Umid: ${out.saved.umidade}%\n` +
+      `Nível: ${out.saved.nivel_de_risco} | Cura: ${out.saved.risco_de_cura}`
+    );
 
-    el("lastCard").style.display = "block";
-    el("lastJson").textContent = JSON.stringify(out, null, 2);
+    // limpa campos “de produção” mas mantém data/hora atual
+    const keepData = el("data").value;
+    const keepHora = el("hora").value;
 
-    // comportamento “app”: limpa e mantém data/hora atual
-    clearForm();
+    frm.reset();
+    clearPreview();
+
+    el("data").value = keepData;
+    el("hora").value = keepHora;
+
+    // reseta botões
+    setActive("resultado", "");
+    setActive("cp", "");
+    el("resultado").value = "";
+    el("cp").value = "";
+
+    schedulePreview();
+
   }catch(err){
     console.error(err);
     setPill("bad", "Erro ❌");
@@ -98,4 +187,6 @@ frm.addEventListener("submit", async (e) => {
 
 // init
 setNow();
+clearPreview();
 setPill("neutral", "Pronto");
+schedulePreview();
