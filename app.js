@@ -1,5 +1,4 @@
 const CONFIG = {
-  // ⚠️ COLE A URL /exec do Apps Script aqui (Deploy → Gerenciar implantações → URL do app da web)
   API_URL: "https://script.google.com/macros/s/AKfycbztSMw67K5w7Y2azoKB7MhrcQBnBux2gLRL6qF4mw5dNkUB3QDImTiSSmjX3kFVHeA6/exec"
 };
 
@@ -50,11 +49,9 @@ function setActive(group, value) {
   if (group === "cp") el("cp").value = value;
 }
 
-// Botões clicáveis
 document.querySelectorAll(".segBtn").forEach(btn => {
   btn.addEventListener("click", () => {
     setActive(btn.dataset.group, btn.dataset.value);
-    // ajuda: quando seleciona, não precisa esperar, mas mantém preview agendado
   });
 });
 
@@ -65,11 +62,6 @@ async function fetchPreview() {
   const data = el("data").value;
   const hora = el("hora").value;
   if (!data || !hora) return;
-
-  if (!CONFIG.API_URL || CONFIG.API_URL.includes("__COLE_SUA_URL_EXEC_AQUI__")) {
-    setPill("bad", "API_URL não configurada");
-    return;
-  }
 
   setPill("neutral", "Buscando clima...");
 
@@ -107,9 +99,7 @@ async function fetchPreview() {
 
 function schedulePreview() {
   if (previewTimer) clearTimeout(previewTimer);
-  previewTimer = setTimeout(() => {
-    fetchPreview();
-  }, 250);
+  previewTimer = setTimeout(fetchPreview, 250);
 }
 
 el("data").addEventListener("change", schedulePreview);
@@ -136,9 +126,10 @@ btnLimpar.addEventListener("click", () => {
 
 // ===== Salvar =====
 async function send(payload) {
+  // ✅ IMPORTANTÍSSIMO: text/plain evita o preflight CORS do Apps Script
   const res = await fetch(CONFIG.API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(payload)
   });
 
@@ -156,11 +147,6 @@ async function send(payload) {
 
 frm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  if (!CONFIG.API_URL || CONFIG.API_URL.includes("__COLE_SUA_URL_EXEC_AQUI__")) {
-    alert("Configure a API_URL no app.js com a URL /exec do Apps Script.");
-    return;
-  }
 
   if (!el("resultado").value) return alert("Selecione o Resultado (Aprovado/Reprovado).");
   if (!el("cp").value) return alert("Selecione Corpo de Prova (Sim/Não).");
