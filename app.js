@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbyVPRN3ynp9N8Azo6ynu4JNcA1arQncVFHYwgB3aNs0slSlE6YH4Ql3f7QW0dF_Uo6U/exec"
+  API_URL: "https://script.google.com/macros/s/AKfycbzgro8m_TssbzMo_5OWcF98_2nuZndVOIGrGs3hKF6iHvNJ-rthNQQQTo-KYY15yUdx/exec"
 };
 
 const el = (id) => document.getElementById(id);
