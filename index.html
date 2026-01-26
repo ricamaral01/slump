@@ -119,13 +119,15 @@
     }
     .grid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap:12px;
     }
-    .full{grid-column:1 / -1}
-    @media (max-width:520px){
-      .grid{grid-template-columns:1fr}
+    .row2{
+      display:grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      gap:12px;
     }
+}
 
     .segWrap{margin-top:14px}
     .segTitle{font-weight:700;margin-bottom:8px}
@@ -240,30 +242,34 @@
 
     <section class="card">
       <form id="frm">
-        <div class="grid">
-          <label>
-            <span>Data</span>
-            <input id="data" type="date" required />
-          </label>
+                <div class="grid">
+          <div class="row2">
+            <label>
+              <span>Data</span>
+              <input id="data" type="date" required />
+            </label>
+
+            <label>
+              <span>Hora</span>
+              <input id="hora" type="time" step="60" required />
+            </label>
+          </div>
+
+          <div class="row2">
+            <label>
+              <span>ID do Lote</span>
+              <input id="lote" type="text" placeholder="Ex.: LOTE-2026-001" required />
+            </label>
+
+            <label>
+              <span>Flow (mm)</span>
+              <input id="flow" type="number" min="0" step="1" placeholder="Ex.: 650" required />
+            </label>
+          </div>
 
           <label>
-            <span>Hora</span>
-            <input id="hora" type="time" step="60" required />
-          </label>
-
-          <label class="full">
-            <span>ID do Lote</span>
-            <input id="lote" type="text" placeholder="Ex.: LOTE-2026-001" required />
-          </label>
-
-          <label class="full">
             <span>Traço</span>
             <input id="traco" type="text" placeholder="Ex.: TR-320" required />
-          </label>
-
-          <label>
-            <span>Flow (mm)</span>
-            <input id="flow" type="number" min="0" step="1" placeholder="Ex.: 650" required />
           </label>
         </div>
 
