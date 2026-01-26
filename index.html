@@ -186,6 +186,8 @@
       border:1px solid var(--border);
       border-radius: 16px;
       background: #FAFAFA;
+      padding: 12px;
+      min-height: 72px;
     }
 
     .pv-k{
@@ -258,10 +260,13 @@
     @media (max-width: 680px){
       .pv-grid{grid-template-columns: repeat(2, minmax(0,1fr));}
     }
-    @media (max-width: 420px){
-      .row2{grid-template-columns:1fr;}
-      .buttons button{flex:1}
+    @media (max-width: 360px){
+      .pv-grid{grid-template-columns:1fr;}
     }
+
+    @media (max-width: 420px){
+  .buttons button{flex:1}
+}
   </style>
 </head>
 <body>
@@ -388,6 +393,7 @@
     const btnAgora = el("btnAgora");
     const btnLimpar = el("btnLimpar");
 
+    // Preview (clima/avisos)
     const pv = {
       temp: el("pvTemp"),
       umid: el("pvUmid"),
@@ -398,6 +404,7 @@
     };
 
     function setPill(_kind, text) {
+      // Mantém o estilo (somente texto)
       if (!statusPill) return;
       statusPill.textContent = text || "";
     }
@@ -431,6 +438,52 @@
       return Number.isFinite(x) ? x : null;
     }
 
+    // ===== PREVIEW (BUSCA DIRETO NA PLANILHA via Apps Script) =====
+    let previewTimer = null;
+
+    async function fetchPreview() {
+      const data = el("data")?.value || "";
+      const hora = el("hora")?.value || "";
+      if (!data || !hora) return;
+
+      setPill("neutral", "Buscando clima...");
+
+      const url =
+        `${CONFIG.API_URL}?action=preview&data=${encodeURIComponent(data)}&hora=${encodeURIComponent(hora)}`;
+
+      try {
+        const res = await fetch(url, { method: "GET" });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || "Preview ok=false");
+
+        const p = json.preview || {};
+        // No HTML, as unidades (°C e %) já estão no <small>, então aqui vai só o número
+        if (pv.temp) pv.temp.textContent = (p.temperatura ?? "—");
+        if (pv.umid) pv.umid.textContent = (p.umidade ?? "—");
+        if (pv.nivel) pv.nivel.textContent = (p.nivel_de_risco ?? "—");
+        if (pv.cura) pv.cura.textContent = (p.risco_de_cura ?? "—");
+
+        if (pv.match) {
+          pv.match.textContent = p.matched_datahora
+            ? new Date(p.matched_datahora).toLocaleString("pt-BR")
+            : "—";
+        }
+        if (pv.diff) pv.diff.textContent = (p.diff_minutes ?? "—");
+
+        setPill("ok", "Pronto");
+      } catch (err) {
+        console.error(err);
+        clearPreview();
+        setPill("bad", "Erro preview");
+      }
+    }
+
+    function schedulePreview() {
+      if (previewTimer) clearTimeout(previewTimer);
+      previewTimer = setTimeout(fetchPreview, 250);
+    }
+
+    // ===== ENVIO (REGISTRO) =====
     async function apiPost(payload) {
       const res = await fetch(CONFIG.API_URL, {
         method: "POST",
@@ -441,22 +494,17 @@
       try { return JSON.parse(text); } catch { return { ok: false, raw: text }; }
     }
 
-    function applyPreview(r) {
-      if (!r) return;
-      if (pv.temp && r.temp != null) pv.temp.textContent = String(r.temp);
-      if (pv.umid && r.umid != null) pv.umid.textContent = String(r.umid);
-      if (pv.nivel && r.nivel != null) pv.nivel.textContent = String(r.nivel);
-      if (pv.cura && r.cura != null) pv.cura.textContent = String(r.cura);
-      if (pv.match && r.match != null) pv.match.textContent = String(r.match);
-      if (pv.diff && r.diff != null) pv.diff.textContent = String(r.diff);
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
       clearPreview();
       setPill("neutral", "Pronto para registrar");
 
+      // Sempre que data/hora mudar, atualiza preview
+      el("data")?.addEventListener("change", schedulePreview);
+      el("hora")?.addEventListener("change", schedulePreview);
+
       if (btnAgora) btnAgora.addEventListener("click", () => {
         setNow();
+        schedulePreview(); // puxa clima do horário atual
         setPill("neutral", "Data/hora atualizadas");
       });
 
@@ -486,8 +534,9 @@
         try {
           const r = await apiPost(payload);
           if (r && r.ok) {
-            applyPreview(r);
             setPill("ok", "Registro salvo ✅");
+            // Após salvar, atualiza preview (garante que está preenchido)
+            schedulePreview();
           } else {
             const msg = (r && (r.message || r.error || r.raw)) ? String(r.message || r.error || r.raw) : "Falha ao salvar";
             setPill("bad", msg);
@@ -497,6 +546,9 @@
           setPill("bad", "Erro de conexão / API");
         }
       });
+
+      // Opcional: se a página abrir já com data/hora preenchidos (cache), faz preview
+      if (el("data")?.value && el("hora")?.value) schedulePreview();
     });
   </script>
 </body>
