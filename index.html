@@ -100,7 +100,13 @@
       white-space:nowrap;
     }
 
-    .grid{
+    
+    .pill.neutral{background:#fff;border-color:var(--border);color:var(--blue);}
+    .pill.ok{background:#E8F5E9;border-color:#16a34a;color:#166534;}
+    .pill.warn{background:#FFF7ED;border-color:#f59e0b;color:#92400e;}
+    .pill.bad{background:#FEE2E2;border-color:#ef4444;color:#991b1b;}
+    .pill.loading{background:#EEF2FF;border-color:#6366f1;color:#3730a3;}
+.grid{
       display:grid;
       grid-template-columns:1fr;
       gap:12px;
@@ -210,7 +216,7 @@
 
     
     .pv-full{grid-column: 1 / -1;}
-    .lvl-ico{font-size:14px;font-weight:1000;display:inline-block;margin-right:32px;}
+    .lvl-ico{font-size:14px;font-weight:1000;display:inline-block;margin-right:8px;}
     .lvl-ok{color:#1f7a2e;}
     .lvl-warn{color:#c08a00;}
     .lvl-bad{color:#b00020;}
@@ -287,7 +293,7 @@
         </div>
       </div>
 
-      <div class="pill" id="statusPill">Pronto para registrar</div>
+      <div class="pill neutral" id="statusPill">Pronto para registrar</div>
     </header>
 
     <main class="card">
@@ -412,9 +418,9 @@
       diff: el("pvDiff")
     };
 
-    function setPill(_kind, text) {
-      // Mantém o estilo (somente texto)
+    function setPill(kind, text) {
       if (!statusPill) return;
+      statusPill.className = "pill " + (kind || "neutral");
       statusPill.textContent = text || "";
     }
 
