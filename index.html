@@ -208,7 +208,13 @@
       font-weight:900;
     }
 
-    .pv-temp{ padding: 14px 14px 12px; }
+    
+    .pv-full{grid-column: 1 / -1;}
+    .lvl-ico{font-size:14px;font-weight:1000;display:inline-block;margin-right:8px;}
+    .lvl-ok{color:#1f7a2e;}
+    .lvl-warn{color:#c08a00;}
+    .lvl-bad{color:#b00020;}
+.pv-temp{ padding: 14px 14px 12px; }
     .pv-umid{ padding: 12px 14px 14px; }
     .pv-nivel{ padding: 16px 12px 10px; }
     .pv-cura{ padding: 10px 12px 16px; }
@@ -332,7 +338,7 @@
           <h2>Clima e Avisos</h2>
 
           <div class="pv-wrap">
-            <div class="pv-grid">
+                        <div class="pv-grid">
               <div class="pv pv-temp">
                 <div class="pv-k">Temperatura</div>
                 <div class="pv-v"><span id="pvTemp">—</span> <small>°C</small></div>
@@ -345,16 +351,19 @@
 
               <div class="pv pv-nivel">
                 <div class="pv-k">Nível</div>
-                <div class="pv-v"><span id="pvNivel">—</span></div>
+                <div class="pv-v">
+                  <span class="lvl-ico" id="pvNivelIco">●</span>
+                  <span id="pvNivel">—</span>
+                </div>
               </div>
 
-              <div class="pv pv-cura">
+              <div class="pv pv-cura pv-full">
                 <div class="pv-k">Cura</div>
                 <div class="pv-v"><span id="pvCura">—</span></div>
               </div>
             </div>
 
-            <div class="pv-line">
+            <div class="pv-line"><div class="pv-line">
               <div class="pv-chip pv-match">
                 <span class="dot"></span>
                 <span>Match:</span> <b id="pvMatch">—</b>
@@ -461,6 +470,24 @@
         if (pv.temp) pv.temp.textContent = (p.temperatura ?? "—");
         if (pv.umid) pv.umid.textContent = (p.umidade ?? "—");
         if (pv.nivel) pv.nivel.textContent = (p.nivel_de_risco ?? "—");
+        // Ícone do nível (verde/amarelo/vermelho)
+        const ico = el("pvNivelIco");
+        if (ico) {
+          const t = String(p.nivel_de_risco ?? "").toUpperCase();
+          ico.classList.remove("lvl-ok","lvl-warn","lvl-bad");
+          if (t.includes("SEGURO") || t.includes("OK")) {
+            ico.classList.add("lvl-ok");
+            ico.textContent = "●";
+          } else if (t.includes("ATEN") || t.includes("ALERTA") || t.includes("CUIDADO")) {
+            ico.classList.add("lvl-warn");
+            ico.textContent = "●";
+          } else if (t.includes("ALTO") || t.includes("RISCO") || t.includes("CRIT")) {
+            ico.classList.add("lvl-bad");
+            ico.textContent = "●";
+          } else {
+            ico.textContent = "●";
+          }
+        }
         if (pv.cura) pv.cura.textContent = (p.risco_de_cura ?? "—");
 
         if (pv.match) {
