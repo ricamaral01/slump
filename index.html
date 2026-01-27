@@ -2,587 +2,224 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Slump / Flow — CONCRETRACK</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CONCRETRACK • Slump / Flow</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#2F3640">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- anti-cache -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <style>
     :root{
-      --bg:#F3F5F8;
-      --surface:#FFFFFF;
-      --border:#E6E6E6;
+      /* === MESMO PADRÃO DO APP CP === */
+      --bg0:#2F3640;
+      --bg1:#262C35;
+      --bg2:#1F242C;
 
-      --text:#111111;
-      --text2:#666666;
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.18);
 
-      --blue:#15416F;
-      --magenta:#A72141;
-      --magentaDark:#921D39;
+      --text:#F3F6FF;
+      --muted:#B9C4D0;
 
-      --radius:18px;
-      --shadow:0 10px 26px rgba(17,17,17,.08);
+      --ok:#16A34A;
+      --warn:#F59E0B;
+      --err:#EF4444;
 
-      --pad:16px;
-
-      --fs:16px;
-      --fs-title:18px;
-      --fs-h2:15px;
-
-      --ctrl-h:46px;
+      --shadow: 0 18px 45px rgba(0,0,0,.45);
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background:var(--bg);
+      min-height:100vh;
       color:var(--text);
-      font-size:var(--fs);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, rgba(0,0,0,.35), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg2));
     }
 
-    .container{
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 18px var(--pad) 26px;
-    }
+    .wrap{ max-width:720px; margin:0 auto; padding:18px; }
 
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin: 6px 0 14px;
+    .title{ font-size:28px; font-weight:1000; }
+    .subtitle{ font-size:14px; color:var(--muted); margin:6px 0 10px; }
+    .accentLine{
+      height:4px; border-radius:999px;
+      background: linear-gradient(90deg,#A72141,#8AC968,transparent);
+      margin-bottom:14px;
     }
-
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:40px;height:40px;border-radius:14px;
-      background: linear-gradient(135deg, var(--blue), #0f2e52);
-      display:grid;place-items:center;
-      color:#fff;font-weight:900;
-      box-shadow: 0 10px 22px rgba(21,65,111,.22);
-      user-select:none;
-    }
-    .titles{display:flex;flex-direction:column;gap:2px}
-    .titles b{color:var(--blue);font-size:20px;letter-spacing:.2px}
-    .titles span{color:var(--text2);font-size:13px}
 
     .card{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius: calc(var(--radius) + 2px);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.20));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      display:grid;
+      gap:14px;
       box-shadow:var(--shadow);
-      overflow:hidden;
+      backdrop-filter: blur(6px);
     }
 
-    .section{
-      padding: 16px;
-      border-top:1px solid var(--border);
-    }
-    .section:first-child{border-top:0}
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-    .section h2{
-      margin:0 0 12px;
-      font-size:var(--fs-h2);
-      letter-spacing:.2px;
-      color:var(--blue);
+    .field{
+      background: rgba(0,0,0,.25);
+      border:1px solid var(--line2);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .label{ font-size:14px; font-weight:900; color:var(--muted); }
+
+    input{
+      margin-top:8px;
+      width:100%;
+      font-size:20px;
+      font-weight:1000;
+      padding:16px;
+      border-radius:14px;
+      border:1px solid rgba(138,201,104,.35);
+      background: rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus{
+      box-shadow:0 0 0 4px rgba(138,201,104,.15);
+    }
+
+    .btn{
+      padding:18px;
+      border-radius:18px;
+      border:1px solid var(--line2);
+      background: rgba(0,0,0,.30);
+      color:var(--text);
+      font-weight:1000;
+      font-size:18px;
+      cursor:pointer;
+      flex:1;
+    }
+
+    .btn.good{
+      background: linear-gradient(180deg,#16A34A,#107737);
+      color:#08130c;
     }
 
     .pill{
-      padding: 10px 12px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      background:#fff;
-      color:var(--blue);
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.2px;
-      white-space:nowrap;
-    }
-
-    
-    .pill.neutral{background:#fff;border-color:var(--border);color:var(--blue);}
-    .pill.ok{background:#E8F5E9;border-color:#16a34a;color:#166534;}
-    .pill.warn{background:#FFF7ED;border-color:#f59e0b;color:#92400e;}
-    .pill.bad{background:#FEE2E2;border-color:#ef4444;color:#991b1b;}
-    .pill.loading{background:#EEF2FF;border-color:#6366f1;color:#3730a3;}
-.grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-    }
-
-    .row2{
-      display:grid;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-      gap:12px;
-    }
-
-    label{display:flex;flex-direction:column;gap:6px}
-    label > span{
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.3px;
-      color:var(--blue);
-    }
-
-    input{
-      height:var(--ctrl-h);
-      border-radius:14px;
-      border:1px solid var(--border);
-      padding:0 12px;
-      font-size:15px;
-      outline:none;
-      background:#fff;
-    }
-    input:focus{
-      border-color: rgba(21,65,111,.55);
-      box-shadow: 0 0 0 4px rgba(21,65,111,.10);
-    }
-    input::placeholder{color:#95A0AF}
-
-    .buttons{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 12px;
-    }
-
-    button{
-      height:44px;
-      border-radius:14px;
-      border:0;
-      padding:0 14px;
-      font-weight:900;
-      letter-spacing:.2px;
-      cursor:pointer;
-    }
-
-    button.primary{
-      background: linear-gradient(135deg, var(--magenta), var(--magentaDark));
-      color:#fff;
-      box-shadow: 0 10px 18px rgba(167,33,65,.18);
-    }
-    button.secondary{
-      background:#fff;
-      color:var(--blue);
-      border:1px solid var(--border);
-    }
-    button.ghost{
-      background: transparent;
-      color: var(--text2);
-      border: 1px dashed var(--border);
-    }
-
-    /* ===== CLIMA / AVISOS — cada item com padding próprio ===== */
-    .pv-wrap{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-    }
-
-    .pv-grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap:10px;
-    }
-
-    .pv{
-      border:1px solid var(--border);
-      border-radius: 16px;
-      background: #FAFAFA;
-      padding: 12px;
-      min-height: 72px;
-    }
-
-    .pv-k{
-      color:var(--text2);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.2px;
-      margin-bottom:6px;
-    }
-    .pv-v{
-      color:var(--blue);
+      align-items:center;
+      gap:12px;
+      padding:16px 18px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: rgba(0,0,0,.30);
       font-size:18px;
       font-weight:1000;
     }
-    .pv-v small{
-      color:var(--text2);
-      font-size:12px;
-      font-weight:900;
-    }
 
-    
-    .pv-full{grid-column: 1 / -1;}
-    .lvl-ico{font-size:14px;font-weight:1000;display:inline-block;margin-right:8px;}
-    .lvl-ok{color:#1f7a2e;}
-    .lvl-warn{color:#c08a00;}
-    .lvl-bad{color:#b00020;}
-.pv-temp{ padding: 14px 14px 12px; }
-    .pv-umid{ padding: 12px 14px 14px; }
-    .pv-nivel{ padding: 16px 12px 10px; }
-    .pv-cura{ padding: 10px 12px 16px; }
+    .dot{ width:14px; height:14px; border-radius:999px; background:var(--warn); }
+    .dot.ok{ background:var(--ok); }
+    .dot.warn{ background:var(--warn); }
+    .dot.err{ background:var(--err); }
 
-    .pv-line{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 10px;
-    }
+    .pvGrid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .pvFull{ grid-column:1/-1; }
 
-    .pv-chip{
+    .pvValue{
+      font-size:30px;
+      font-weight:1000;
       display:flex;
       align-items:center;
-      gap:8px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      background:#fff;
-      color:var(--blue);
-      font-size:13px;
-      font-weight:900;
-    }
-    .pv-chip b{font-weight:1000}
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: var(--magenta);
-      box-shadow: 0 0 0 3px rgba(167,33,65,.12);
+      gap:12px;
     }
 
-    .hint{
-      margin-top: 10px;
-      border:1px solid var(--border);
-      background:#fff;
-      border-radius: 16px;
-      padding: 12px 14px;
-      color: var(--text2);
-      font-size: 13px;
-      line-height:1.35;
+    .lvl-ico{
+      font-size:32px; /* ⬅ BEM MAIOR */
+      font-weight:1000;
     }
+    .lvl-ok{ color:var(--ok); }
+    .lvl-warn{ color:var(--warn); }
+    .lvl-bad{ color:var(--err); }
 
-    .foot{
-      margin-top: 12px;
-      color: var(--text2);
-      font-size: 12px;
-      text-align:center;
+    @media(max-width:520px){
+      .pvGrid{ grid-template-columns:1fr 1fr; }
     }
-
-    @media (max-width: 680px){
-      .pv-grid{grid-template-columns: repeat(2, minmax(0,1fr));}
-    }
-    @media (max-width: 360px){
-      .pv-grid{grid-template-columns:1fr;}
-    }
-
-    @media (max-width: 420px){
-  .buttons button{flex:1}
-}
   </style>
 </head>
-<body>
-  <div class="container">
 
-    <header class="top">
-      <div class="brand">
-        <div class="logo">C</div>
-        <div class="titles">
-          <b>SLUMP / FLOW</b>
-          <span>CONCRETRACK • Concrefer</span>
+<body>
+<div class="wrap">
+  <div class="title">🧪 CONCRETRACK • Slump / Flow</div>
+  <div class="subtitle">Registro rápido com preview climático</div>
+  <div class="accentLine"></div>
+
+  <div class="card">
+    <form id="frm">
+
+      <div class="grid2">
+        <div class="field">
+          <div class="label">Data</div>
+          <input id="data" type="date" required>
+        </div>
+        <div class="field">
+          <div class="label">Hora</div>
+          <input id="hora" type="time" required>
         </div>
       </div>
 
-      <div class="pill neutral" id="statusPill">Pronto para registrar</div>
-    </header>
+      <div class="grid2">
+        <div class="field">
+          <div class="label">ID do Lote</div>
+          <input id="lote">
+        </div>
+        <div class="field">
+          <div class="label">Flow (mm)</div>
+          <input id="flow" type="number">
+        </div>
+      </div>
 
-    <main class="card">
-      <form id="frm">
+      <div class="field">
+        <div class="label">Traço</div>
+        <input id="traco">
+      </div>
 
-        <section class="section">
-          <h2>Registro</h2>
+      <button class="btn good">💾 SALVAR</button>
 
-          <div class="grid">
-            <div class="row2">
-              <label>
-                <span>Data</span>
-                <input id="data" type="date" required />
-              </label>
+      <div class="pill">
+        <span id="dot" class="dot"></span>
+        <span id="status">Pronto para registrar</span>
+      </div>
 
-              <label>
-                <span>Hora</span>
-                <input id="hora" type="time" step="60" required />
-              </label>
-            </div>
-
-            <div class="row2">
-              <label>
-                <span>ID do Lote</span>
-                <input id="lote" type="text" placeholder="Ex.: LOTE-2026-001" required />
-              </label>
-
-              <label>
-                <span>Flow (mm)</span>
-                <input id="flow" type="number" min="0" step="1" placeholder="Ex.: 650" required />
-              </label>
-            </div>
-
-            <label>
-              <span>Traço</span>
-              <input id="traco" type="text" placeholder="Ex.: TR-320" required />
-            </label>
+      <div class="pvGrid">
+        <div class="field"><div class="label">Temperatura</div><div id="pvTemp" class="pvValue">—</div></div>
+        <div class="field"><div class="label">Umidade</div><div id="pvUmid" class="pvValue">—</div></div>
+        <div class="field">
+          <div class="label">Nível</div>
+          <div class="pvValue">
+            <span id="lvl" class="lvl-ico">●</span>
+            <span id="pvNivel">—</span>
           </div>
+        </div>
+        <div class="field pvFull"><div class="label">Cura</div><div id="pvCura" class="pvValue">—</div></div>
+      </div>
 
-          <div class="buttons">
-            <button id="btnEnviar" type="submit" class="primary">Salvar</button>
-            <button id="btnAgora" type="button" class="secondary">Agora</button>
-            <button id="btnLimpar" type="button" class="ghost">Limpar</button>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2>Clima e Avisos</h2>
-
-          <div class="pv-wrap">
-                        <div class="pv-grid">
-              <div class="pv pv-temp">
-                <div class="pv-k">Temperatura</div>
-                <div class="pv-v"><span id="pvTemp">—</span> <small>°C</small></div>
-              </div>
-
-              <div class="pv pv-umid">
-                <div class="pv-k">Umidade</div>
-                <div class="pv-v"><span id="pvUmid">—</span> <small>%</small></div>
-              </div>
-
-              <div class="pv pv-nivel">
-                <div class="pv-k">Nível</div>
-                <div class="pv-v">
-                  <span class="lvl-ico" id="pvNivelIco">●</span>
-                  <span id="pvNivel">—</span>
-                </div>
-              </div>
-
-              <div class="pv pv-cura pv-full">
-                <div class="pv-k">Cura</div>
-                <div class="pv-v"><span id="pvCura">—</span></div>
-              </div>
-            </div>
-
-            <div class="pv-line"><div class="pv-line">
-              <div class="pv-chip pv-match">
-                <span class="dot"></span>
-                <span>Match:</span> <b id="pvMatch">—</b>
-              </div>
-              <div class="pv-chip pv-diff">
-                <span class="dot"></span>
-                <span>Dif:</span> <b id="pvDiff">—</b>
-              </div>
-            </div>
-
-            <div class="hint" id="resultado">
-              O app busca na <b>clima_import</b> a <b>DataHora mais próxima</b> e aplica Temperatura/Umidade automaticamente.
-              <br/>Os avisos de risco/nível/cura aparecem conforme sua regra na planilha.
-            </div>
-          </div>
-        </section>
-
-      </form>
-    </main>
-
-    <footer class="foot">
-      <span>Concrefer • CONCRETRACK</span>
-    </footer>
-
+    </form>
   </div>
+</div>
 
-  <script>
-    const CONFIG = {
-      API_URL: "https://script.google.com/macros/s/AKfycbzgro8m_TssbzMo_5OWcF98_2nuZndVOIGrGs3hKF6iHvNJ-rthNQQQTo-KYY15yUdx/exec"
-    };
-
-    const el = (id) => document.getElementById(id);
-
-    const frm = el("frm");
-    const statusPill = el("statusPill");
-    const btnAgora = el("btnAgora");
-    const btnLimpar = el("btnLimpar");
-
-    // Preview (clima/avisos)
-    const pv = {
-      temp: el("pvTemp"),
-      umid: el("pvUmid"),
-      nivel: el("pvNivel"),
-      cura: el("pvCura"),
-      match: el("pvMatch"),
-      diff: el("pvDiff")
-    };
-
-    function setPill(kind, text) {
-      if (!statusPill) return;
-      statusPill.className = "pill " + (kind || "neutral");
-      statusPill.textContent = text || "";
-    }
-
-    function pad2(n) { return String(n).padStart(2, "0"); }
-
-    function setNow() {
-      const d = new Date();
-      el("data").value = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-      el("hora").value = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    }
-
-    function clearPreview() {
-      if (pv.temp) pv.temp.textContent = "—";
-      if (pv.umid) pv.umid.textContent = "—";
-      if (pv.nivel) pv.nivel.textContent = "—";
-      if (pv.cura) pv.cura.textContent = "—";
-      if (pv.match) pv.match.textContent = "—";
-      if (pv.diff) pv.diff.textContent = "—";
-    }
-
-    function clearForm() {
-      if (!frm) return;
-      frm.reset();
-      clearPreview();
-      setPill("neutral", "Pronto para registrar");
-    }
-
-    function toNumber(v) {
-      const x = Number(String(v ?? "").replace(",", "."));
-      return Number.isFinite(x) ? x : null;
-    }
-
-    // ===== PREVIEW (BUSCA DIRETO NA PLANILHA via Apps Script) =====
-    let previewTimer = null;
-
-    async function fetchPreview() {
-      const data = el("data")?.value || "";
-      const hora = el("hora")?.value || "";
-      if (!data || !hora) return;
-
-      setPill("neutral", "Buscando clima...");
-
-      const url =
-        `${CONFIG.API_URL}?action=preview&data=${encodeURIComponent(data)}&hora=${encodeURIComponent(hora)}`;
-
-      try {
-        const res = await fetch(url, { method: "GET" });
-        const json = await res.json();
-        if (!json.ok) throw new Error(json.error || "Preview ok=false");
-
-        const p = json.preview || {};
-        // No HTML, as unidades (°C e %) já estão no <small>, então aqui vai só o número
-        if (pv.temp) pv.temp.textContent = (p.temperatura ?? "—");
-        if (pv.umid) pv.umid.textContent = (p.umidade ?? "—");
-        if (pv.nivel) pv.nivel.textContent = (p.nivel_de_risco ?? "—");
-        // Ícone do nível (verde/amarelo/vermelho)
-        const ico = el("pvNivelIco");
-        if (ico) {
-          const t = String(p.nivel_de_risco ?? "").toUpperCase();
-          ico.classList.remove("lvl-ok","lvl-warn","lvl-bad");
-          if (t.includes("SEGURO") || t.includes("OK")) {
-            ico.classList.add("lvl-ok");
-            ico.textContent = "●";
-          } else if (t.includes("ATEN") || t.includes("ALERTA") || t.includes("CUIDADO")) {
-            ico.classList.add("lvl-warn");
-            ico.textContent = "●";
-          } else if (t.includes("ALTO") || t.includes("RISCO") || t.includes("CRIT")) {
-            ico.classList.add("lvl-bad");
-            ico.textContent = "●";
-          } else {
-            ico.textContent = "●";
-          }
-        }
-        if (pv.cura) pv.cura.textContent = (p.risco_de_cura ?? "—");
-
-        if (pv.match) {
-          pv.match.textContent = p.matched_datahora
-            ? new Date(p.matched_datahora).toLocaleString("pt-BR")
-            : "—";
-        }
-        if (pv.diff) pv.diff.textContent = (p.diff_minutes ?? "—");
-
-        setPill("ok", "Pronto");
-      } catch (err) {
-        console.error(err);
-        clearPreview();
-        setPill("bad", "Erro preview");
-      }
-    }
-
-    function schedulePreview() {
-      if (previewTimer) clearTimeout(previewTimer);
-      previewTimer = setTimeout(fetchPreview, 250);
-    }
-
-    // ===== ENVIO (REGISTRO) =====
-    async function apiPost(payload) {
-      const res = await fetch(CONFIG.API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-      const text = await res.text();
-      try { return JSON.parse(text); } catch { return { ok: false, raw: text }; }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      clearPreview();
-      setPill("neutral", "Pronto para registrar");
-
-      // Sempre que data/hora mudar, atualiza preview
-      el("data")?.addEventListener("change", schedulePreview);
-      el("hora")?.addEventListener("change", schedulePreview);
-
-      if (btnAgora) btnAgora.addEventListener("click", () => {
-        setNow();
-        schedulePreview(); // puxa clima do horário atual
-        setPill("neutral", "Data/hora atualizadas");
-      });
-
-      if (btnLimpar) btnLimpar.addEventListener("click", () => clearForm());
-
-      if (!frm) return;
-
-      frm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const payload = {
-          action: "registrar_slump",
-          data: el("data")?.value || "",
-          hora: el("hora")?.value || "",
-          lote: el("lote")?.value?.trim() || "",
-          traco: el("traco")?.value?.trim() || "",
-          flow: toNumber(el("flow")?.value)
-        };
-
-        if (!payload.data || !payload.hora || !payload.lote || !payload.traco || payload.flow === null) {
-          setPill("warn", "Preencha os campos obrigatórios");
-          return;
-        }
-
-        setPill("loading", "Salvando…");
-
-        try {
-          const r = await apiPost(payload);
-          if (r && r.ok) {
-            setPill("ok", "Registro salvo ✅");
-            // Após salvar, atualiza preview (garante que está preenchido)
-            schedulePreview();
-          } else {
-            const msg = (r && (r.message || r.error || r.raw)) ? String(r.message || r.error || r.raw) : "Falha ao salvar";
-            setPill("bad", msg);
-          }
-        } catch (err) {
-          console.error(err);
-          setPill("bad", "Erro de conexão / API");
-        }
-      });
-
-      // Opcional: se a página abrir já com data/hora preenchidos (cache), faz preview
-      if (el("data")?.value && el("hora")?.value) schedulePreview();
-    });
-  </script>
+<script>
+if("serviceWorker"in navigator){
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
 </body>
 </html>
