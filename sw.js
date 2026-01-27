@@ -1,7 +1,7 @@
 const CACHE = "ct-slump-v2";
 const ASSETS = [
-  "./index_Slump.html",
-  "./manifest_Slump.json",
+  "./index.html",
+  "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
 ];
